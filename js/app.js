@@ -1,3 +1,11 @@
+// TODO:  I have set all markers to visible: false; Next I need to toggle 
+// the visibility of each marker if it meets certain criteria, i.e. the 
+// name is clicked or the dinosaur in the legend is clicked.
+// Next I need to rewrite the API call to wikipedia to start as soon as 
+// the markers are made and not call too many times per second
+// Also work on Firebase API and Wikipedia image display
+// Continue to read Knockout documentation
+
 var map, geoCoder, infoWindow;
 var startLoc = new google.maps.LatLng(33.5, 7.6);
 var person = false;
@@ -600,19 +608,19 @@ var ViewModel = function() {
 		self.dinoList().push( new Dino(item) );
 	});
 
-	// enable filtering later  Fpr now it pust 10 dinosaurs in list
+	// enable filtering later  For now it pust 10 dinosaurs in list
 	// later this should find the closest dinosaurs and only add them to the list
 	this.filteredDinoList = ko.observableArray();
 
-	this.filterDinos = ko.computed(function() {
-		if (self.search) {
+	/*this.filterDinos = ko.computed(function() {
+		if (self.) {
 			var num = 0;
 			while ( self.filteredDinoList.length < 10 ) {
 				self.filteredDinoList.push(this.DinoList[num]);
 				num++;
 			}
 		}
-	});
+	});*/
 	
 	// watch for user input
 	this.location = ko.observable("");
@@ -634,7 +642,6 @@ var ViewModel = function() {
 				//center map and display marker
 				map.setCenter(loc);
 				map.setZoom(5);
-				self.createDinoMarkers();
 				//self.createDinoMarkers(self.dinoList);
 				//self.newDinoMarker();
 				personMarker = new google.maps.Marker({
@@ -656,10 +663,20 @@ var ViewModel = function() {
 		});
 	});
 
-	this.allDinoMarkers = [];
-	this.carnivoreMarkers = [];
-	this.omnivoreMarkers = [];
-	this.herbivoreMarkers = [];
+	this.allDinoMarkers = ko.observableArray();
+	this.carnivoreMarkers = ko.observableArray();
+	this.omnivoreMarkers = ko.observableArray();
+	this.herbivoreMarkers = ko.observableArray();
+
+	/*this.displayThisDino = function(dino) {
+		var dinoMarkers = self.allDinoMarkers();
+		for (var i = 0; i < dinoMarkers.length; i++) {
+			console.log(dino);
+			if (dino == dinoMarkers[i].title) {
+				map.panTo(dinoMarkers[i].position);
+			}
+		}
+	};*/
 
 	this.createDinoMarkers = function() {
 		var dinoList = self.dinoList();
@@ -676,40 +693,41 @@ var ViewModel = function() {
         		    	lng: lon
         		    },
         		    icon: icon,
-        		    title: dino.name()
+        		    title: dino.name(),
+        		    visible: false
         		});
         		if (dino.food() == 'carnivore') {
-        			self.carnivoreMarkers.push(marker);
+        			self.carnivoreMarkers().push(marker);
         		} else if (dino.food() == 'herbivore') {
-        			self.herbivoreMarkers.push(marker);
+        			self.herbivoreMarkers().push(marker);
         		} else if (dino.food() == 'omnivore') {
-        			self.omnivoreMarkers.push(marker);
+        			self.omnivoreMarkers().push(marker);
         		}
-        		self.allDinoMarkers.push(marker);
+        		self.allDinoMarkers().push(marker);
+        		console.log(marker);
 			}
 		}
-		console.log(self.carnivoreMarkers);
 		self.createInfoWindows();	
 	};
 
 	this.createInfoWindows = function(){
-		for (var i = 0; i < self.allDinoMarkers.length; i++) {
-			var marker = self.allDinoMarkers[i];
+		for (var i = 0; i < self.allDinoMarkers().length; i++) {
+			var marker = self.allDinoMarkers()[i];
 			var infowindow = new google.maps.InfoWindow({
       			content: "",
       			title: marker.title
  			});
  			google.maps.event.addListener(marker, 'click', (function(marker) {
  				return function() {
+ 					// Add more detail about location -- name the country or general location in markup
  					infowindow.setContent("<div class='infoWindow'><h3>Hi, my name is " + marker.title + "!</h3></div>");
    					infowindow.open(map, marker);
    					self.dinoDataRequest(marker, infowindow);
+   					map.panTo(marker.position);
     				};
    				})(marker));
  		}
 	};
-
-	this.displayThisDino = function(){};
 
 	this.dinoDataRequest = function(marker, infowindow){
     	var url = "http://en.wikipedia.org/w/api.php?action=query&prop=extracts&format=json&exintro=&titles=";
@@ -725,7 +743,7 @@ var ViewModel = function() {
     			var keys = Object.keys(response.query.pages);
     			var key = parseInt(keys[0], 10);
     			var paragraph = response.query.pages[key].extract.substring(0,300);
-    			console.log(response);
+    			// Add list of continents where dinosaur lived 
     			infowindow.setContent("<div class='infoWindow'><h3>Hi, my name is " + marker.title + "!</h3></div><div>" + paragraph + "...</p></div><div>For more see: <a href='http://www.wikipedia.org/wiki/" + marker.title + "' target='_blank'>Wikipedia</a></div>");
     			//$.ajax({
     			//	url: "http://en.wikipedia.org/w/api.php?action=query&titles=Al-Farabi&prop=pageimages&format=json&pithumbsize=100"
@@ -771,7 +789,7 @@ var ViewModel = function() {
         map.mapTypes.set('new_bluish_style', bluishStyledMap);
         //set this new mapTypeId to be displayed
         map.setMapTypeId('new_bluish_style');
-
+        self.createDinoMarkers();
     };
 
     this.init();

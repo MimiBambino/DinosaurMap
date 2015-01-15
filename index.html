@@ -20,16 +20,18 @@
             <input id='cityInput' data-bind="value: location" placeholder="Enter Your Location">
         </div>
         <div id="legend">
-          <h4>Click on a legend image to filter by type</h4>
-          <img src="img/manSm.png"> You<br>
-          <img src="img/blueDino41.png"> Omnivore<br>
-          <img src="img/tRex.png"> Meat Eater<br>
-          <img src="img/plantEaterSm.png"> Plant Eater<br> 
+
+          <h4 id='legend_title'>Legend</h4>
+          <img src="img/manSm.png"><p class='legend_caption'>You</p><br>
+          <hr>
+          <img src="img/blueDino41.png"><p class='legend_caption'>Omnivore</p><br><hr>
+          <img src="img/tRex.png"><p class='legend_caption'>Meat Eater</p><br><hr>
+          <img src="img/plantEaterSm.png"><p class='legend_caption'>Plant Eater</p><br> 
         </div>
         <aside id="dinoList">
-          <h4 class="msg-to-user">Find Popular Dinosaurs</h4>
+          <h4 class="msg-to-user">Popular Dinosaurs</h4>
           <ul data-bind="foreach: { data: dinoList, as: 'dino'}" id="list">
-            <li data-bind="click: $parent.displayThisDino, text: dino.name" class="corner-info">
+            <li data-bind="text: dino.name" class="corner-info">
             </li>
           </ul>
         </aside>
