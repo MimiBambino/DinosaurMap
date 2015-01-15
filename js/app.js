@@ -595,9 +595,9 @@ var ViewModel = function() {
 	this.search = false;
 
 	// copy of all dinoData
-	this.dinoList = [];
+	this.dinoList = ko.observableArray();
 	dinoData.forEach(function(item) {
-		self.dinoList.push( new Dino(item) );
+		self.dinoList().push( new Dino(item) );
 	});
 
 	// enable filtering later  Fpr now it pust 10 dinosaurs in list
@@ -662,8 +662,9 @@ var ViewModel = function() {
 	this.herbivoreMarkers = [];
 
 	this.createDinoMarkers = function() {
-		for (var i = 0; i < self.dinoList.length; i++) {
-			var dino = self.dinoList[i];
+		var dinoList = self.dinoList();
+		for (var i = 0; i < dinoList.length; i++) {
+			var dino = dinoList[i];
 			for (var j = 0; j < dino.locations().length; j++){
 				var icon = dino.icon();
 				var lat = dino.locations()[j][0];
@@ -707,6 +708,8 @@ var ViewModel = function() {
    				})(marker));
  		}
 	};
+
+	this.displayThisDino = function(){};
 
 	this.dinoDataRequest = function(marker, infowindow){
     	var url = "http://en.wikipedia.org/w/api.php?action=query&prop=extracts&format=json&exintro=&titles=";
