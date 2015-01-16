@@ -1,36 +1,36 @@
 html, body {
-	width: 100%;
-	height: 100%;
-	font-family: Calibri, sans-serif;
-	margin: -2px;
+  width: 100%;
+  height: 100%;
+  font-family: Calibri, sans-serif;
+  margin: -2px;
 }
 input {
-	font-weight: bold;
-	height: 50px;
-	width: 100%;
-	text-align: center;
+  font-weight: bold;
+  height: 50px;
+  width: 100%;
+  text-align: center;
 }
 input:focus {
-	outline: 0;
+  outline: 0;
 }
 ul {
-	list-style-type: none;
+  list-style-type: none;
 }
 
 #mapDiv {
-	width: 100%;
-	height: 100%;
+  width: 100%;
+  height: 100%;
 }
 #legend {
   padding-top: 0;
-	background-color: #ddd;
-	padding: 0 1% 1% 1%;
-	width: 140px;
-	position: fixed;
-	left: 20px;
-	bottom: 40px;
-	z-index: 1001;
-	box-shadow: 3px 3px 2px #555;
+  background-color: #ddd;
+  padding: 0 1% 1% 1%;
+  width: 140px;
+  position: fixed;
+  left: 20px;
+  bottom: 40px;
+  z-index: 1001;
+  box-shadow: 3px 3px 2px #555;
 }
 #legend_title {
   text-align: center;
@@ -40,13 +40,13 @@ ul {
   float: right;
 }
 #location-search {
-	box-shadow: 3px 3px 2px #555;
-	position: fixed;
-	left: 30%;
-	top: 0;
-	width: 170px;
-	margin-left: -85px;
-	z-index: 1100;
+  box-shadow: 3px 3px 2px #555;
+  position: fixed;
+  left: 30%;
+  top: 0;
+  width: 170px;
+  margin-left: -85px;
+  z-index: 1100;
 }
 
 .results{background:rgba(255,255,255,.8);border-left:1px solid #888;box-shadow:#aaa -1px 0 3px;max-width:240px;position:fixed;right:0;top:0;height:100%;overflow-y:scroll}
@@ -72,12 +72,12 @@ ul {
 }
 
 #result-search {
-	border: 3px solid #2D8C12;
-	display: flex;
+  border: 3px solid #2D8C12;
+  display: flex;
 }
 #result-list {
-	height: 600px;
-	overflow: auto;
+  height: 600px;
+  overflow: auto;
 }
 
 /* Side Bar */
@@ -280,30 +280,30 @@ aside {
 
 
 @media (min-width: 401px) {
-	#info-window {
-		background-color: #fff;
-		width: 350px;
-		max-height: 100%;
-		position: fixed;
-		top: 0;
-		right: 0;
-		z-index: 1000;
-	}
-	.venue {
-		padding: 5px;
-		border-bottom: 1px solid #DDDDDD;
-		height: auto;
-	}
-	.venueLeft {
-		display: inline-block;
-		width: 210px;
-	}
-	.venueRight {
-		display: inline-block;
-		float: right;
-		width: 100px;
-	}
-	#legend {
-	display: block;
+  #info-window {
+    background-color: #fff;
+    width: 350px;
+    max-height: 100%;
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 1000;
+  }
+  .venue {
+    padding: 5px;
+    border-bottom: 1px solid #DDDDDD;
+    height: auto;
+  }
+  .venueLeft {
+    display: inline-block;
+    width: 210px;
+  }
+  .venueRight {
+    display: inline-block;
+    float: right;
+    width: 100px;
+  }
+  #legend {
+  display: block;
 }
 }
