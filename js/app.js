@@ -583,6 +583,7 @@ var Dino = function(data) {
 	this.locations = ko.observableArray(data.latLongs);
 	this.food = ko.observable(data.food);
 	this.description = ko.observable(data.description);
+	this.marker = ko.observable();
 
 	this.icon = ko.computed(function() {
 		if (this.food() === 'carnivore') {
@@ -663,20 +664,83 @@ var ViewModel = function() {
 		});
 	});
 
+	this.buttonText = ko.observable("Show All Dinos!");
+
 	this.allDinoMarkers = ko.observableArray();
+
+
 	this.carnivoreMarkers = ko.observableArray();
 	this.omnivoreMarkers = ko.observableArray();
 	this.herbivoreMarkers = ko.observableArray();
 
-	/*this.displayThisDino = function(dino) {
-		var dinoMarkers = self.allDinoMarkers();
-		for (var i = 0; i < dinoMarkers.length; i++) {
-			console.log(dino);
-			if (dino == dinoMarkers[i].title) {
-				map.panTo(dinoMarkers[i].position);
+	this.toggleAllDinos = function() {
+		var markers = self.allDinoMarkers();
+
+		// check to see if the 0th and 10th dinosaurs are visible this avoids this 
+		// function changing visibility if the user has chosen only one dinosaur
+		if (markers[0].visible == false || markers[10].visible == false) {
+
+			for (var i = 0; i < markers.length; i++) {
+				var marker = markers[i];
+				marker.setVisible(true);
+				self.buttonText("Hide All Dinos!");
+			}
+		} else if (markers[0].visible == true || markers[10].visible == true) {
+			for (var i = 0; i < markers.length; i++){
+				var marker = markers[i];
+				marker.setVisible(false);
+				self.buttonText("Show All Dinos!");
 			}
 		}
-	};*/
+	};
+
+	this.toggleOmnivores = function() {
+		var markers = self.omnivoreMarkers();
+		if (markers[0].visible == false || markers[2].visible == false) {
+			for (var i = 0; i < markers.length; i++) {
+				var marker = markers[i];
+				marker.setVisible(true);
+			}
+		} else if (markers[0].visible == true || markers[2].visible == true) {
+			for (var i = 0; i < markers.length; i++){
+				var marker = markers[i];
+				marker.setVisible(false);
+			}
+		}
+	};
+
+	this.toggleCarnivores = function() {
+		var markers = self.carnivoreMarkers();
+		if (markers[0].visible == false || markers[10].visible == false) {
+			for (var i = 0; i < markers.length; i++) {
+				var marker = markers[i];
+				marker.setVisible(true);
+			}
+		} else if (markers[0].visible == true || markers[10].visible == true) {
+			for (var i = 0; i < markers.length; i++){
+				var marker = markers[i];
+				marker.setVisible(false);
+			}
+		}
+	};
+
+	this.toggleHerbivores = function() {
+		var markers = self.herbivoreMarkers();
+		if (markers[0].visible == false || markers[10].visible == false) {
+			for (var i = 0; i < markers.length; i++) {
+				var marker = markers[i];
+				marker.setVisible(true);
+			}
+		} else if (markers[0].visible == true || markers[10].visible == true) {
+			for (var i = 0; i < markers.length; i++){
+				var marker = markers[i];
+				marker.setVisible(false);
+			}
+		}
+	};
+
+	this.displayThisDino = function() {
+	};
 
 	this.createDinoMarkers = function() {
 		var dinoList = self.dinoList();
@@ -704,7 +768,7 @@ var ViewModel = function() {
         			self.omnivoreMarkers().push(marker);
         		}
         		self.allDinoMarkers().push(marker);
-        		console.log(marker);
+        		self.dinoList.marker = marker;
 			}
 		}
 		self.createInfoWindows();	
@@ -755,6 +819,7 @@ var ViewModel = function() {
     			'Access-Control-Allow-Origin': true
     		 }
 			} );
+    	console.log("request sent");
     };
 
 	this.init = function() {
