@@ -305,6 +305,24 @@ var ViewModel = function() {
         }
     };
 
+// set initial state of instructions. Temporarily all true for styling.
+    self.inputInstruction = true;
+    self.filterInstruction = true;
+    self.clickList = true;
+    self.showForm = true;
+
+    self.nextInstruction = function(){
+    // write a function that will toggle truthiness of each property after click.
+    };
+// Obviously, rewrite with ternary operator
+    self.showLegend = function() {
+        if (self.inputInstruction) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
     self.init = function() {
         google.maps.event.addDomListener(window, 'load', self.initMap);
     };

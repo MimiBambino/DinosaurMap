@@ -13,14 +13,17 @@
     </head>
     <body>
       <div id='page'>
-        <div id="location-search">
-              <input id='cityInput' data-bind="value: location" placeholder="Enter Your Location">
+        <div id="header">
+          <div id='inputInstruction' data-bind="visible: inputInstruction, click: nextInstruction">Enter your location <span class="icon-arrow-right2"></span></div>
+          <div id="location-search">
+            <input id='cityInput' data-bind="value: location" placeholder="Location">
           </div>
+        </div>
+        <div id="toggleDinosInstruction" data-bind="visible: filterInstruction">Click a legend image to filter by dinosaur type. <span class="icon-arrow-right2"></span></div>
         <div id='container'>
           <div id="mapDiv">
-
           </div>
-          <div id="legend">
+          <div id="legend" data-bind="visible: showLegend">
             <h4 id='legend_title'>Legend</h4>
             <img src="img/manSm.png"><p class='legend_caption'>You</p><br>
             <hr>
