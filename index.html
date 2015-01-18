@@ -7,35 +7,40 @@
         </script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
         <script type="text/javascript" src="js/knockout.js"></script>
+        <link rel="stylesheet" type="text/css" href="css/reset.css">
         <link rel="stylesheet" type="text/css" href="css/styles.css">
 
     </head>
     <body>
-        <div id="mapDiv">
-          <ul data-bind="foreach: dinoList">
-            <li></li>
-          </ul>
-        </div>
+      <div id='page'>
         <div id="location-search">
-            <input id='cityInput' data-bind="value: location" placeholder="Enter Your Location">
-        </div>
-        <div id="legend">
+              <input id='cityInput' data-bind="value: location" placeholder="Enter Your Location">
+          </div>
+        <div id='container'>
+          <div id="mapDiv">
 
-          <h4 id='legend_title'>Legend</h4>
-          <img src="img/manSm.png"><p class='legend_caption'>You</p><br>
-          <hr>
-          <img src="img/blueDino41.png" data-bind='click: toggleOmnivores'><p class='legend_caption'>Omnivore</p><br><hr>
-          <img src="img/tRex.png" data-bind='click: toggleCarnivores'><p class='legend_caption'>Meat Eater</p><br><hr>
-          <img src="img/plantEaterSm.png" data-bind='click: toggleHerbivores'><p class='legend_caption'>Plant Eater</p><br> 
-          <button data-bind="click: toggleAllDinos, text: buttonText">Show All Dinos!</button>
+          </div>
+          <div id="legend">
+            <h4 id='legend_title'>Legend</h4>
+            <img src="img/manSm.png"><p class='legend_caption'>You</p><br>
+            <hr>
+            <img src="img/blueDino41.png" data-bind='click: toggleOmnivores'><p class='legend_caption'>Omnivore</p><br><hr>
+            <img src="img/tRex.png" data-bind='click: toggleCarnivores'><p class='legend_caption'>Meat Eater</p><br><hr>
+            <img src="img/plantEaterSm.png" data-bind='click: toggleHerbivores'><p class='legend_caption'>Plant Eater</p><br> 
+            <button data-bind="click: toggleAllDinos, text: buttonText">Show All Dinos!</button>
+          </div>
+          <aside id="dinoList">
+            <h4 class="msg-to-user">Popular Dinosaurs</h4>
+            <ul data-bind="foreach: dinoList" id="list">
+              <li data-bind="text: name, click: $parent.displayThisDino" class="corner-info">
+              </li>
+            </ul>
+          </aside>
         </div>
-        <aside id="dinoList">
-          <h4 class="msg-to-user">Popular Dinosaurs</h4>
-          <ul data-bind="foreach: dinoList" id="list">
-            <li data-bind="text: name, click: $parent.displayThisDino" class="corner-info">
-            </li>
-          </ul>
-        </aside>
-        <script type="text/javascript" src="js/app.js"></script>
+      </div>
+      <script src="https://cdn.firebase.com/js/client/2.1.1/firebase.js"></script>
+      <script type="text/javascript" src="js/view.js"></script>
+      <script type="text/javascript" src="js/model.js"></script>
+      <script type="text/javascript" src="js/app.js"></script>
     </body>
 </html>
