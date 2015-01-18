@@ -133,7 +133,7 @@ var ViewModel = function() {
                 var key = parseInt(keys[0], 10);
                 var paragraph = response.query.pages[key].extract.substring(0,300);
                 // Add list of continents where dinosaur lived 
-                infowindow.setContent("<div class='infoWindow'><h3>Hi, my name is " + marker.title + "!</h3></div><div>" + paragraph + "...</p></div><div>For more see: <a href='http://www.wikipedia.org/wiki/" + marker.title + "' target='_blank'>Wikipedia</a></div>");
+                infowindow.setContent("<div class='infoWindow'><h3>Hi, my name is <strong>" + marker.title + "</strong>!</h3></div><div>" + paragraph + "...</p></div><div>For more see: <a href='http://www.wikipedia.org/wiki/" + marker.title + "' target='_blank'>Wikipedia</a></div>");
             },
             type:'GET',
             headers: { 
