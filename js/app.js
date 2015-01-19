@@ -3,25 +3,23 @@
 // clicked from the list.  Now I need to rewrite the clearDinoMarkers function
 // so that only the expected dinosaurs are shown after a new click.
 // Also when a marker is removed close any open infoboxes.
-// Recenter map on newest displayed dinosaurs
 // Next I need to rewrite the API call to wikipedia to start as soon as 
 // the markers are made and not call too many times per second
-// Also work on Firebase API and Wikipedia image display
-// Continue to read Knockout documentation
+// Also work on Wikipedia image display
 
-var map, geoCoder, infoWindow;
-var startLoc = new google.maps.LatLng(33.5, 7.6);
+
+var map, geoCoder;
 var person = false;
 
-function handleNoGeo(errorFlag) {
-    if(errorFlag == true) {
-        console.log("browser supports geoloc, but failed");
-    }
-    else {
-        console.log("no browser support for geoloc");
-    }
-    map.setCenter({lat: 53.5485, lng: -113.519499});
-}
+//function handleNoGeo(errorFlag) {
+//    if (errorFlag == true) {
+//        console.log("browser supports geoloc, but failed");
+//    }
+//    else {
+//        console.log("no browser support for geoloc");
+//    }
+//    map.setCenter({lat: 53.5485, lng: -113.519499});
+//}
 
 var Dino = function(data) {
     this.name = ko.observable(data.name);
@@ -29,6 +27,9 @@ var Dino = function(data) {
     this.locations = ko.observableArray(data.latLongs);
     this.food = ko.observable(data.food);
     this.description = ko.observable(data.description);
+    this.markers = ko.observableArray();
+    this.infobox = ko.observable();
+    this.imageArray = ko.observableArray();
 
     this.icon = ko.computed(function() {
         if (this.food() === 'carnivore') {
@@ -42,14 +43,44 @@ var Dino = function(data) {
 }
 
 var ViewModel = function() {
+
     // save a reference to ViewModel object
     var self = this;
-    // if user has not searched yet, don't display any icons
-    self.search = false;
 
-    // copy of all dinoData
-    self.dinoList = ko.observableArray();
+    self.startLoc = new google.maps.LatLng(33.5, 7.6);
+
+    self.init = function() {
+        google.maps.event.addDomListener(window, 'load', self.initMap);
+    };
+
+    self.initMap = function() {
+        //create a new StyledMapType and reference it with the style array
+        var bluishStyledMap = new google.maps.StyledMapType(View.bluishMapStyle,
+            {name: "Bluish Map"});
+        google.maps.visualRefresh = true;
+
+        //Setting starting options of map
+        var mapOptions = {
+            center: self.startLoc,
+            zoom: 3,
+            mapTypeControlOptions: {mapTypeIds: [google.maps.MapTypeId.TERRAIN, 'new_bluish_style']},
+            maxZoom: 12,
+            minZoom: 3
+            };
+
+        // Getting map DOM element
+        var mapElement = document.getElementById('mapDiv');
+        map = new google.maps.Map(mapElement, mapOptions);
+
+        //relate new mapTypeId to the styledMapType object
+        map.mapTypes.set('new_bluish_style', bluishStyledMap);
+        //set this new mapTypeId to be displayed
+        map.setMapTypeId('new_bluish_style');
+        self.fetchFirebase();
+    };
+
     self.firebaseData = {};
+    // Retrieve data from Firebase
     self.fetchFirebase = function(){
         var FB = new Firebase("https://intense-inferno-1224.firebaseio.com/");
         FB.on('value', function(data) {
@@ -59,6 +90,10 @@ var ViewModel = function() {
             });
     };
 
+    // Store a local copy of all dinoData
+    self.dinoList = ko.observableArray();
+
+    // Populate the dinoList array 
     self.setDinoList = function(data) {
         data.forEach(function(item) {
             self.dinoList().push( new Dino(item) );
@@ -66,6 +101,13 @@ var ViewModel = function() {
         self.createDinoMarkers();
     };
 
+    // Keep track of marker groupings by type
+    self.allDinoMarkers = ko.observableArray();
+    self.carnivoreMarkers = ko.observableArray();
+    self.omnivoreMarkers = ko.observableArray();
+    self.herbivoreMarkers = ko.observableArray();
+
+    // Create map markers and set each one as a property in the Dino object in the dinoList array
     self.createDinoMarkers = function() {
         var dinoList = self.dinoList();
         for (var i = 0; i < dinoList.length; i++) {
@@ -92,35 +134,51 @@ var ViewModel = function() {
                     self.omnivoreMarkers().push(marker);
                 }
                 self.allDinoMarkers().push(marker);
+                self.dinoLost[i].marker(marker);
             }
         }
         self.createInfoWindows();
     };
 
-    self.createInfoWindows = function(){
-        for (var i = 0; i < self.allDinoMarkers().length; i++) {
-            var marker = self.allDinoMarkers()[i];
+    // Create an infowindow for each marker
+    // Need to make sure that only one info marker is created for each Dino in dinoList
+    // and that it is reused for each marker of that dino type
+    self.createInfoWindows = function() {
+        var i = 0;
+        var markers = self.allDinoMarkers();
+        var length = markers.length;
+        for (; i < length; i++) {
+            var marker = markers[i];
             var infowindow = new google.maps.InfoWindow({
                 content: "",
                 title: marker.title
             });
+            var j = 0;
+            var dinos = self.dinoList();
+            for (; j < dinos.length; j++) {
+                if (dinos[j].name == marker.title) {
+                    dinos[j].infowindow(infowindow);
+                }
+            }
+            // Need to abstract this.  It should be made prior to the click event
+            // and stored so that duplicate requests are not sent
+            self.dinoDataRequest(infowindow);
             google.maps.event.addListener(marker, 'click', (function(marker) {
                 return function() {
                     // Add more detail about location -- name the country or general location in markup
-                    infowindow.setContent("<div class='infoWindow'><h3>Hi, my name is " + marker.title + "!</h3></div>");
                     infowindow.open(map, marker);
-                    self.dinoDataRequest(marker, infowindow);
+                    //self.dinoDataRequest(infowindow);
                     map.panTo(marker.position);
                     };
                 })(marker));
-            var photoArray;
-
         }
+        self.dinoPhotoRequest();
     };
 
-    self.dinoDataRequest = function(marker, infowindow){
+    // Ajax call to Wikipedia to get content for infowindows
+    self.dinoDataRequest = function(infowindow){
         var url = "http://en.wikipedia.org/w/api.php?action=query&prop=extracts&format=json&exintro=&titles=";
-        url += marker.title;
+        url += infowindow.title;
 
         $.ajax( {
             url: url,
@@ -144,7 +202,10 @@ var ViewModel = function() {
         console.log("request sent");
     };
 
-    /// Also make call for photos and save them to a photoArray property for each dino in dinoList
+    // Ajax call to find dinosaur images
+    // Save images to a photoArray property for each dino in dinoList
+    self.dinoPhotoRequest = function() {};
+
 
     /*self.dinoPhotoRequest = function(marker, infowindow){
         $.ajax({
@@ -169,8 +230,16 @@ var ViewModel = function() {
              })
     };*/
 
-    
-    // watch for user input
+    // Begin User Interface Instructions and listen for events
+
+    // If user has not searched yet, don't display any icons
+    // *****************Refactoring Progress:  I stopped here*******************
+    self.search = ko.observable(false);
+    self.displayInstructions = function(){
+        if (self.search()) {
+
+        }
+    }
     self.location = ko.observable("");
 
     self.getLocation = ko.computed(function() {
@@ -206,94 +275,75 @@ var ViewModel = function() {
             else {
                 //could not find location based on search
                 //self.locationError(true);
-                return startLoc;
+                return self.startLoc;
             }
         });
     });
 
     self.buttonText = ko.observable("Show All Dinos!");
 
-    self.allDinoMarkers = ko.observableArray();
 
-    self.carnivoreMarkers = ko.observableArray();
-    self.omnivoreMarkers = ko.observableArray();
-    self.herbivoreMarkers = ko.observableArray();
 
-    self.toggleAllDinos = function() {
-        var markers = self.allDinoMarkers();
-
-        // check to see if the 0th and 10th dinosaurs are visible this avoids this 
-        // function changing visibility if the user has chosen only one dinosaur
-        if (markers[0].visible == false || markers[10].visible == false) {
-
-            for (var i = 0; i < markers.length; i++) {
-                var marker = markers[i];
-                marker.setVisible(true);
-                self.buttonText("Hide All Dinos!");
-            }
-        } else if (markers[0].visible == true || markers[10].visible == true) {
-            for (var i = 0; i < markers.length; i++){
-                var marker = markers[i];
-                marker.setVisible(false);
-                self.buttonText("Show All Dinos!");
-            }
+    self.toggleAllDinos = function(){
+        self.reset();
+        if (self.buttonText() == "Show All Dinos!") {
+            self.display(self.allDinoMarkers());
+            self.buttonText("Hide All Dinos!");
         }
     };
 
-    self.toggleOmnivores = function() {
-        var markers = self.omnivoreMarkers();
+    self.toggleDinos = function() {
+        switch (arguments[0]) {
+            case "omnivore":
+                var markers = self.omnivoreMarkers();
+                self.display(markers);
+                break;
+            case "carnivore":
+                var markers = self.carnivoreMarkers();
+                self.display(markers);
+                break;
+            case "herbivore":
+                var markers = self.herbivoreMarkers();
+                self.display(markers);
+                break;
+            case "all":
+
+                break;
+        }
+    }
+    self.display = function(markers) {
+        self.closeInfobox();
         if (markers[0].visible == false || markers[2].visible == false) {
             for (var i = 0; i < markers.length; i++) {
-                var marker = markers[i];
-                marker.setVisible(true);
+            var marker = markers[i];
+            marker.setVisible(true);
             }
         } else if (markers[0].visible == true || markers[2].visible == true) {
             for (var i = 0; i < markers.length; i++){
-                var marker = markers[i];
-                marker.setVisible(false);
+            var marker = markers[i];
+            marker.setVisible(false);
             }
         }
     };
-
-    self.toggleCarnivores = function() {
-        var markers = self.carnivoreMarkers();
-        if (markers[0].visible == false || markers[10].visible == false) {
-            for (var i = 0; i < markers.length; i++) {
-                var marker = markers[i];
-                marker.setVisible(true);
-            }
-        } else if (markers[0].visible == true || markers[10].visible == true) {
-            for (var i = 0; i < markers.length; i++){
-                var marker = markers[i];
-                marker.setVisible(false);
-            }
-        }
-    };
-
-    self.toggleHerbivores = function() {
-        var markers = self.herbivoreMarkers();
-        if (markers[0].visible == false || markers[10].visible == false) {
-            for (var i = 0; i < markers.length; i++) {
-                var marker = markers[i];
-                marker.setVisible(true);
-            }
-        } else if (markers[0].visible == true || markers[10].visible == true) {
-            for (var i = 0; i < markers.length; i++){
-                var marker = markers[i];
-                marker.setVisible(false);
-            }
-        }
-    };
-
-    self.clearDinoMarkers = function(){
+  
+    self.reset = function(){
+        self.closeInfobox();
         var markers = self.allDinoMarkers();
-        for (var i = 0; i < markers.length; i++) {
+        var i = 0;
+        for (; i < markers.length; i++) {
             markers[i].setVisible(false);
         }
     };
 
+    self.closeInfobox = function() {
+//        if (self.infoWindow()) {
+//            self.infoWindow().close();
+//        }
+    };
+
     self.displayThisDino = function() {
-        //self.clearDinoMarkers();
+        self.reset();
+        self.closeInfobox();
         var name = arguments[0].name();
         var markers = self.allDinoMarkers();
         for (var i = 0; i < markers.length; i++) {
@@ -324,43 +374,7 @@ var ViewModel = function() {
         }
     };
 
-    self.init = function() {
-        google.maps.event.addDomListener(window, 'load', self.initMap);
-    };
-
-    self.initMap = function() {
-        //create a new StyledMapType and reference it with the style array
-        var bluishStyledMap = new google.maps.StyledMapType(View.bluishMapStyle,
-            {name: "Bluish Map"});
-              
-        //Enabling new cartography and themes
-
-        google.maps.visualRefresh = true;
-
-        //Setting starting options of map
-        var mapOptions = {
-            center: new google.maps.LatLng(33.5, 7.6),
-            zoom: 3,
-            mapTypeControlOptions: {mapTypeIds: [google.maps.MapTypeId.TERRAIN, 'new_bluish_style']},
-            maxZoom: 12,
-            minZoom: 3
-            };
-
-        //Getting map DOM element
-        var mapElement = document.getElementById('mapDiv');
-
-        //Creating a map with DOM element which is just obtained
-        map = new google.maps.Map(mapElement, mapOptions);
-
-        //relate new mapTypeId to the styledMapType object
-        map.mapTypes.set('new_bluish_style', bluishStyledMap);
-        //set this new mapTypeId to be displayed
-        map.setMapTypeId('new_bluish_style');
-        self.fetchFirebase();
-        self.createDinoMarkers();
-    };
-
-    this.init();
+    self.init();
 };
 
 ko.applyBindings( new ViewModel() );
