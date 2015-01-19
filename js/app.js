@@ -308,6 +308,7 @@ var ViewModel = function() {
 // set initial state of instructions. Temporarily all true for styling.
     self.inputInstruction = true;
     self.filterInstruction = true;
+    self.listInstruction = true;
     self.clickList = true;
     self.showForm = true;
 

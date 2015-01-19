@@ -14,7 +14,8 @@
     <body>
       <div id='page'>
         <div id="header">
-          <div id='inputInstruction' data-bind="visible: inputInstruction, click: nextInstruction">Enter your location <span class="icon-arrow-right2"></span></div>
+          <div id='selectFavoriteDino' data-bind="visible: listInstruction">Select a dinosaur from the list.<span class="icon-arrow-down2"></span></div>
+          <div id='inputInstruction' data-bind="visible: inputInstruction">Enter your location <span class="icon-arrow-right2"></span></div>
           <div id="location-search">
             <input id='cityInput' data-bind="value: location" placeholder="Location">
           </div>

@@ -146,7 +146,7 @@ input {
   color: #ddd;
   font-size: 16px;
   height: 50px;
-  width: 10%;
+  width: 200px;
   text-align: center;
   left: 32%;
   top: 1%;
@@ -173,7 +173,13 @@ input:focus {
 }
 
 #selectFavoriteDino {
-
+  position: absolute;
+  left: 2%;
+  top: 2%;
+  color: #ddd;
+  font-size: 24px;
+  max-width: 200px;
+  line-height: 1.2;
 }
 
 #legend {
@@ -481,3 +487,125 @@ aside {
   display: block;
 }
 }*/
+
+@media (max-width: 1700px) {
+  #toggleDinosInstruction {
+    left: 3%;
+  }
+
+  #selectFavoriteDino {
+    top: 1%;
+  }
+
+  #cityInput {
+  font-size: 16px;
+  left: 34%;
+}
+
+}
+
+@media (max-width: 1550px){
+
+  #inputInstruction {
+    left: 16%;
+    top: 4%;
+  }
+
+  #container {
+  height: 90%;
+  margin-top: 6%;
+}
+
+  #cityInput {
+    top: 2.5%;
+  }
+
+}
+
+@media (max-width: 1450px){
+  #toggleDinosInstruction {
+    left: 1%;
+  }
+}
+
+@media (max-width: 1300px) {
+  #container {
+    width: 80%;
+    margin-left: 18%;
+    margin-right: 2%;
+    height: 90%;
+    margin-top: 8%;
+  }
+  #cityInput {
+    left: 40%;
+  }
+  #inputInstruction, #selectFavoriteDino, #toggleDinosInstruction {
+    font-size: 20px;
+  }
+
+  #inputInstruction {
+    left: 20%;
+  }
+
+  #selectFavoriteDino {
+    top: 3%;
+  }
+
+  #toggleDinosInstruction {
+    max-width: 180px;
+  }
+
+  #legend {
+    bottom: 3%;
+  }
+}
+
+@media (max-width: 1000px) {
+  #container {
+    height: 85%;
+    margin-top: 12%;
+  }
+
+  #cityInput {
+    left: 50%;
+  }
+
+  #container {
+    width: 75%;
+    margin-left: 22%;
+    margin-bottom: 0;
+  }
+
+  #inputInstruction {
+    left: 25%;
+  }
+
+}
+
+@media (max-width: 790px) {
+  #container {
+    height: 88%;
+    margin-left: 23%;
+    width: 70%;
+    margin-left: 28%;
+  }
+  #cityInput {
+    left: 60%;
+  }
+
+   #inputInstruction {
+    left: 30%;
+  }
+}
+
+@media (max-width: 650px) {
+  #cityInput {
+    left: 66%;
+    width: 180px;
+  }
+
+  #container {
+    height: 85%;
+    margin-top: 15%;
+  }
+}
