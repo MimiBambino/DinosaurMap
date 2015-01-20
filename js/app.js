@@ -1,25 +1,14 @@
-// TODO:  
-// Dinosaurs toggle from the legend.  The correct dinosaur displays when 
+// TODO:
+// Dinosaurs toggle from the legend.  The correct dinosaur displays when
 // clicked from the list.  Now I need to rewrite the clearDinoMarkers function
 // so that only the expected dinosaurs are shown after a new click.
 // Also when a marker is removed close any open infoboxes.
-// Next I need to rewrite the API call to wikipedia to start as soon as 
+// Next I need to rewrite the API call to wikipedia to start as soon as
 // the markers are made and not call too many times per second
 // Also work on Wikipedia image display
 
-
 var map, geoCoder;
 var person = false;
-
-//function handleNoGeo(errorFlag) {
-//    if (errorFlag == true) {
-//        console.log("browser supports geoloc, but failed");
-//    }
-//    else {
-//        console.log("no browser support for geoloc");
-//    }
-//    map.setCenter({lat: 53.5485, lng: -113.519499});
-//}
 
 var Dino = function(data) {
     this.name = ko.observable(data.name);
@@ -49,6 +38,16 @@ var ViewModel = function() {
 
     self.startLoc = new google.maps.LatLng(33.5, 7.6);
 
+    self.locationInstruction = ko.observable(false);
+    self.filterDinoInstruction = ko.observable(false);
+    self.dinoListInstruction = ko.observable(false);
+    self.showLegend = ko.observable(false);
+
+    self.setFalse = function(){
+        self.filterDinoInstruction(false);
+        self.dinoListInstruction(true);
+    };
+
     self.init = function() {
         google.maps.event.addDomListener(window, 'load', self.initMap);
     };
@@ -77,6 +76,7 @@ var ViewModel = function() {
         //set this new mapTypeId to be displayed
         map.setMapTypeId('new_bluish_style');
         self.fetchFirebase();
+        self.locationInstruction(true);
     };
 
     self.firebaseData = {};
@@ -93,7 +93,7 @@ var ViewModel = function() {
     // Store a local copy of all dinoData
     self.dinoList = ko.observableArray();
 
-    // Populate the dinoList array 
+    // Populate the dinoList array
     self.setDinoList = function(data) {
         data.forEach(function(item) {
             self.dinoList().push( new Dino(item) );
@@ -190,11 +190,11 @@ var ViewModel = function() {
                 var keys = Object.keys(response.query.pages);
                 var key = parseInt(keys[0], 10);
                 var paragraph = response.query.pages[key].extract.substring(0,300);
-                // Add list of continents where dinosaur lived 
+                // Add list of continents where dinosaur lived
                 infowindow.setContent("<div class='infoWindow'><h3>Hi, my name is <strong>" + marker.title + "</strong>!</h3></div><div>" + paragraph + "...</p></div><div>For more see: <a href='http://www.wikipedia.org/wiki/" + marker.title + "' target='_blank'>Wikipedia</a></div>");
             },
             type:'GET',
-            headers: { 
+            headers: {
                 'Api-User-Agent': "Cynthia O\'Donnell: mimibambino@gmail.com",
                 'Access-Control-Allow-Origin': true
              }
@@ -218,12 +218,12 @@ var ViewModel = function() {
                 //var keys = Object.keys(response.query.pages);
                 //var key = parseInt(keys[0], 10);
                 //var paragraph = response.query.pages[key].extract.substring(0,300);
-                // Add list of continents where dinosaur lived 
+                // Add list of continents where dinosaur lived
                 infowindow.setContent("<div class='infoWindow'><h3>Hi, my name is " + marker.title + "!</h3></div><div>" + paragraph + "...</p></div><div>For more see: <a href='http://www.wikipedia.org/wiki/" + marker.title + "' target='_blank'>Wikipedia</a></div>");
 
             },
             type:'GET',
-            headers: { 
+            headers: {
                 'Api-User-Agent': "Cynthia O\'Donnell: mimibambino@gmail.com",
                 'Access-Control-Allow-Origin': true
              }
@@ -232,14 +232,16 @@ var ViewModel = function() {
 
     // Begin User Interface Instructions and listen for events
 
-    // If user has not searched yet, don't display any icons
-    // *****************Refactoring Progress:  I stopped here*******************
-    self.search = ko.observable(false);
-    self.displayInstructions = function(){
-        if (self.search()) {
+    // After the page loads, the text "Enter Your Location" appears by the location input area
+    // The "Select a Dinosaur", "Click a Legend", and the Legend are hidden.
+    // After the user searches for a location, Location Instruction fades out,
+    // the map pans to the location, the man icon appears, and the Legend and
+    // Legend Instruction fade in.
+    // After the user has toggled a dinosaur by type, the Legend instruction
+    // fades out and the List and List Instruction fade in.
+    // After the User has selected a dinosaur from the list, the List Instruction
+    // fades out and the map pans to the dinosaur marker
 
-        }
-    }
     self.location = ko.observable("");
 
     self.getLocation = ko.computed(function() {
@@ -267,6 +269,9 @@ var ViewModel = function() {
                     icon: 'img/manSm.png'
                 });
                 self.location("");
+                self.locationInstruction(false);
+                self.filterDinoInstruction(true);
+                self.showLegend(true);
 
                 // this indicates that the user's icon is displayed
                 person = true;
@@ -281,8 +286,6 @@ var ViewModel = function() {
     });
 
     self.buttonText = ko.observable("Show All Dinos!");
-
-
 
     self.toggleAllDinos = function(){
         self.reset();
@@ -307,10 +310,10 @@ var ViewModel = function() {
                 self.display(markers);
                 break;
             case "all":
-
                 break;
         }
-    }
+    };
+
     self.display = function(markers) {
         self.closeInfobox();
         if (markers[0].visible == false || markers[2].visible == false) {
@@ -325,7 +328,7 @@ var ViewModel = function() {
             }
         }
     };
-  
+
     self.reset = function(){
         self.closeInfobox();
         var markers = self.allDinoMarkers();
@@ -355,26 +358,20 @@ var ViewModel = function() {
         }
     };
 
-// set initial state of instructions. Temporarily all true for styling.
-    self.inputInstruction = true;
-    self.filterInstruction = true;
-    self.listInstruction = true;
-    self.clickList = true;
-    self.showForm = true;
-
-    self.nextInstruction = function(){
-    // write a function that will toggle truthiness of each property after click.
-    };
-// Obviously, rewrite with ternary operator
-    self.showLegend = function() {
-        if (self.inputInstruction) {
-            return false;
-        } else {
-            return true;
-        }
-    };
-
     self.init();
+};
+
+ko.bindingHandlers.fadeVisible = {
+    init: function(element, valueAccessor) {
+        // Initially set the element to be instantly visible/hidden depending on the value
+        var value = valueAccessor();
+        $(element).toggle(ko.unwrap(value)); // Use "unwrapObservable" so we can handle values that may or may not be observable
+    },
+    update: function(element, valueAccessor) {
+        // Whenever the value subsequently changes, slowly fade the element in or out
+        var value = valueAccessor();
+        ko.unwrap(value) ? $(element).fadeIn() : $(element).fadeOut();
+    }
 };
 
 ko.applyBindings( new ViewModel() );
