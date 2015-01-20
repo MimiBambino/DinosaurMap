@@ -17,7 +17,7 @@ var Dino = function(data) {
     this.food = ko.observable(data.food);
     this.description = ko.observable(data.description);
     this.markers = ko.observableArray();
-    this.infobox = ko.observable();
+    this.infoWindow = ko.observable();
     this.imageArray = ko.observableArray();
 
     this.icon = ko.computed(function() {
@@ -40,12 +40,11 @@ var ViewModel = function() {
 
     self.locationInstruction = ko.observable(false);
     self.filterDinoInstruction = ko.observable(false);
-    self.dinoListInstruction = ko.observable(false);
+    self.dinoListInstruction = ko.observable(false);  // Need to set back to false after click
     self.showLegend = ko.observable(false);
 
     self.setFalse = function(){
-        self.filterDinoInstruction(false);
-        self.dinoListInstruction(true);
+
     };
 
     self.init = function() {
@@ -81,6 +80,8 @@ var ViewModel = function() {
 
     self.firebaseData = {};
     // Retrieve data from Firebase
+
+
     self.fetchFirebase = function(){
         var FB = new Firebase("https://intense-inferno-1224.firebaseio.com/");
         FB.on('value', function(data) {
@@ -127,14 +128,17 @@ var ViewModel = function() {
                     visible: false
                 });
                 if (dino.food() == 'carnivore') {
+                    console.log("carnivore added");
                     self.carnivoreMarkers().push(marker);
                 } else if (dino.food() == 'herbivore') {
+                    console.log("herbivore added");
                     self.herbivoreMarkers().push(marker);
                 } else if (dino.food() == 'omnivore') {
+                    console.log("omnivore added");
                     self.omnivoreMarkers().push(marker);
                 }
                 self.allDinoMarkers().push(marker);
-                self.dinoLost[i].marker(marker);
+                dino.markers().push(marker);
             }
         }
         self.createInfoWindows();
@@ -145,25 +149,23 @@ var ViewModel = function() {
     // and that it is reused for each marker of that dino type
     self.createInfoWindows = function() {
         var i = 0;
-        var markers = self.allDinoMarkers();
-        var length = markers.length;
+        var dinos = self.dinoList();
+        var length = dinos.length;
         for (; i < length; i++) {
-            var marker = markers[i];
             var infowindow = new google.maps.InfoWindow({
                 content: "",
-                title: marker.title
+                title: dinos[i].name()
             });
-            var j = 0;
-            var dinos = self.dinoList();
-            for (; j < dinos.length; j++) {
-                if (dinos[j].name == marker.title) {
-                    dinos[j].infowindow(infowindow);
-                }
-            }
+            dinos[i].infoWindow(infowindow);
             // Need to abstract this.  It should be made prior to the click event
             // and stored so that duplicate requests are not sent
             self.dinoDataRequest(infowindow);
-            google.maps.event.addListener(marker, 'click', (function(marker) {
+            var j = 0;
+            var markers = dinos[i].markers();
+            var markerLength = markers.length
+            for (; j < markerLength; j++) {
+                var marker = markers[j];
+                google.maps.event.addListener(marker, 'click', (function(marker) {
                 return function() {
                     // Add more detail about location -- name the country or general location in markup
                     infowindow.open(map, marker);
@@ -171,6 +173,7 @@ var ViewModel = function() {
                     map.panTo(marker.position);
                     };
                 })(marker));
+            }
         }
         self.dinoPhotoRequest();
     };
@@ -179,7 +182,9 @@ var ViewModel = function() {
     self.dinoDataRequest = function(infowindow){
         var url = "http://en.wikipedia.org/w/api.php?action=query&prop=extracts&format=json&exintro=&titles=";
         url += infowindow.title;
-
+        if (infowindow.title == "Saturnalia" || infowindow.title == "Balaur") {
+            url += "_(dinosaur)";
+        }
         $.ajax( {
             url: url,
             xhrFields: {
@@ -191,15 +196,14 @@ var ViewModel = function() {
                 var key = parseInt(keys[0], 10);
                 var paragraph = response.query.pages[key].extract.substring(0,300);
                 // Add list of continents where dinosaur lived
-                infowindow.setContent("<div class='infoWindow'><h3>Hi, my name is <strong>" + marker.title + "</strong>!</h3></div><div>" + paragraph + "...</p></div><div>For more see: <a href='http://www.wikipedia.org/wiki/" + marker.title + "' target='_blank'>Wikipedia</a></div>");
+                infowindow.setContent("<div class='infoWindow'><h3>Hi, my name is <strong>" + infowindow.title + "</strong>!</h3></div><div>" + paragraph + "...</p></div><div>For more see: <a href='http://www.wikipedia.org/wiki/" + infowindow.title + "' target='_blank'>Wikipedia</a></div>");
             },
             type:'GET',
             headers: {
                 'Api-User-Agent': "Cynthia O\'Donnell: mimibambino@gmail.com",
                 'Access-Control-Allow-Origin': true
              }
-            } );
-        console.log("request sent");
+            });
     };
 
     // Ajax call to find dinosaur images
@@ -286,28 +290,50 @@ var ViewModel = function() {
     });
 
     self.buttonText = ko.observable("Show All Dinos!");
+    self.activeDinos = ko.observableArray();
 
-    self.toggleAllDinos = function(){
-        self.reset();
-        if (self.buttonText() == "Show All Dinos!") {
-            self.display(self.allDinoMarkers());
-            self.buttonText("Hide All Dinos!");
+    self.reset = function(){
+        self.closeInfobox();
+        var i = 0;
+        var markers = self.activeDinos();
+        for (; i < markers.length; i++) {
+            markers[i].setVisible(false);
+            markers.pop(markers[i]);
         }
     };
 
+    self.toggleAllDinos = function(){
+        self.reset();
+        self.closeInfobox();
+        self.toggleDinos("omnivore");
+        self.toggleDinos("carnivore");
+        self.toggleDinos("herbivore");
+        if (self.buttonText() == "Show All Dinos!"){
+            self.buttonText("Hide All Dinos!");
+        } else {
+            self.buttonText("Show All Dinos!");
+        }
+    };
+
+
     self.toggleDinos = function() {
+        self.filterDinoInstruction(false);
+        self.dinoListInstruction(true);
         switch (arguments[0]) {
             case "omnivore":
                 var markers = self.omnivoreMarkers();
                 self.display(markers);
+                self.activeDinos().push(markers);
                 break;
             case "carnivore":
                 var markers = self.carnivoreMarkers();
                 self.display(markers);
+                self.activeDinos().push(markers);
                 break;
             case "herbivore":
                 var markers = self.herbivoreMarkers();
                 self.display(markers);
+                self.activeDinos().push(markers);
                 break;
             case "all":
                 break;
@@ -320,21 +346,14 @@ var ViewModel = function() {
             for (var i = 0; i < markers.length; i++) {
             var marker = markers[i];
             marker.setVisible(true);
+            self.activeDinos().push(marker);
             }
         } else if (markers[0].visible == true || markers[2].visible == true) {
             for (var i = 0; i < markers.length; i++){
             var marker = markers[i];
             marker.setVisible(false);
+            self.activeDinos().pop(marker);
             }
-        }
-    };
-
-    self.reset = function(){
-        self.closeInfobox();
-        var markers = self.allDinoMarkers();
-        var i = 0;
-        for (; i < markers.length; i++) {
-            markers[i].setVisible(false);
         }
     };
 
@@ -353,6 +372,7 @@ var ViewModel = function() {
             var marker = markers[i];
             if (name == marker.title) {
                 marker.setVisible(true);
+                self.activeDinos().push(marker);
                 console.log(name);
             }
         }
