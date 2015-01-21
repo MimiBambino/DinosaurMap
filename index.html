@@ -37,13 +37,11 @@
             <img src="img/plantEaterSm.png" data-bind='click: toggleDinos.bind($data, "herbivore")'><p class='legend_caption'>Plant Eater</p><br>
           </div>
         </div>
-        <aside id="dinoListView">
-          <h4 class="msg-to-user">Popular Dinosaurs</h4>
-          <ul data-bind="foreach: dinoList" id="list">
-            <li data-bind="text: name, click: $parent.displayThisDino" class="corner-info">
-            </li>
-          </ul>
-        </aside>
+          <aside id="dinoListView">
+            <ul id="list" data-bind="foreach: dinoData, fadeVisible: dinoListInstruction">
+              <li class="dino" data-bind="text: name, click: $parent.displayThisDino">
+            </ul>
+          </aside>
       </div>
       <script src="https://cdn.firebase.com/js/client/2.1.1/firebase.js"></script>
       <script type="text/javascript" src="js/view.js"></script>

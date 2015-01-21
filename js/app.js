@@ -1,11 +1,7 @@
 // TODO:
-// Dinosaurs toggle from the legend.  The correct dinosaur displays when
-// clicked from the list.  Now I need to rewrite the clearDinoMarkers function
-// so that only the expected dinosaurs are shown after a new click.
-// Also when a marker is removed close any open infoboxes.
-// Next I need to rewrite the API call to wikipedia to start as soon as
-// the markers are made and not call too many times per second
-// Also work on Wikipedia image display
+// Wikipedia image display
+// add click counter to legend images to require 3 clicks before list appears
+// Fertig!
 
 var map, geoCoder;
 var person = false;
@@ -42,6 +38,7 @@ var ViewModel = function() {
     self.filterDinoInstruction = ko.observable(false);
     self.dinoListInstruction = ko.observable(false);  // Need to set back to false after click
     self.showLegend = ko.observable(false);
+    self.listVisible = ko.observable(true);  // Change this later
     self.activeInfowindow = ko.observable();
 
     self.setFalse = function(){
@@ -98,7 +95,6 @@ var ViewModel = function() {
         data.forEach(function(item) {
             self.dinoList().push( new Dino(item) );
         });
-        console.log(self.dinoList()[10].name);
         self.createDinoMarkers();
     };
 
@@ -309,10 +305,15 @@ var ViewModel = function() {
             marker.setVisible(true);
             }
         } else if (markers[0].visible == true || markers[2].visible == true) {
-            for (var i = 0; i < markers.length; i++){
+            self.hide(markers);
+
+        }
+    };
+
+    self.hide = function(markers) {
+        for (var i = 0; i < markers.length; i++){
             var marker = markers[i];
             marker.setVisible(false);
-            }
         }
     };
 
@@ -320,13 +321,20 @@ var ViewModel = function() {
         if (self.activeInfowindow()){
             self.activeInfowindow().close();
         }
-        var name = arguments[0].name();
-        var markers = self.allDinoMarkers();
-        for (var i = 0; i < markers.length; i++) {
-            var marker = markers[i];
-            if (name == marker.title) {
+        self.hide(self.omnivoreMarkers());
+        self.hide(self.carnivoreMarkers());
+        self.hide(self.herbivoreMarkers());
+        var name = arguments[0].name;
+        var dinos = self.dinoList();
+        var length = dinos.length;
+        var i = 0;
+        for (var i = 0; i < length; i++) {
+            var dino = dinos[i];
+            var marker = dinos[i].markers()[0];
+            if (name == dino.name) {
                 marker.setVisible(true);
-                console.log(name);
+                map.panTo(marker.position);
+                break;
             }
         }
     };
