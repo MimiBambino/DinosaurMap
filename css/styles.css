@@ -82,7 +82,7 @@ html, body, #page {
 
 #page {
   background: linear-gradient(
-      rgba(0, 0, 0, 0.8), 
+      rgba(0, 0, 0, 0.8),
       rgba(0, 0, 0, 0.7)
     ), linear-gradient(
       rgba(255,255,255,0.4),
@@ -124,7 +124,7 @@ html, body, #page {
 
 #container:before, #container:after {
   content:"";
-    position:absolute; 
+    position:absolute;
     z-index:-1;
     -webkit-box-shadow:0 0 20px rgba(150,150,150,0.8);
     -moz-box-shadow:0 0 20px rgba(150,150,150,0.8);
@@ -135,15 +135,15 @@ html, body, #page {
     right:0;
     -moz-border-radius:100px / 10px;
     border-radius:100px / 10px;
-} 
+}
 
 #container:after {
-  right:10px; 
+  right:10px;
     left:auto;
-    -webkit-transform:skew(8deg) rotate(3deg); 
-       -moz-transform:skew(8deg) rotate(3deg);     
-        -ms-transform:skew(8deg) rotate(3deg);     
-         -o-transform:skew(8deg) rotate(3deg); 
+    -webkit-transform:skew(8deg) rotate(3deg);
+       -moz-transform:skew(8deg) rotate(3deg);
+        -ms-transform:skew(8deg) rotate(3deg);
+         -o-transform:skew(8deg) rotate(3deg);
             transform:skew(8deg) rotate(3deg);
 }
 
@@ -206,6 +206,18 @@ input:focus {
   line-height: 1.2;
 }
 
+aside {
+  background: rgba(0,0,0,0.3);
+  color: #ddd;
+  padding-left: 10px;
+  position: absolute;
+  width: 200px;
+  top: 10%;
+  left: 1.5%;
+  font-size: 20px;
+  border-radius: 10px;
+}
+
 #legend {
   border-radius: 10px;
   padding-top: 0;
@@ -225,20 +237,6 @@ input:focus {
 }
 .legend_caption {
   float: right;
-}
-button {
-  border-radius: 10px;
-  margin: 0 auto;
-  display: block;
-  background-color: #444;
-  font-size: 16px;
-  padding: 3%;
-  color: #eee;
-}
-
-button:hover {
-  background-color: #666;
-  color: #fff;
 }
 
 .infoWindow {
@@ -282,19 +280,12 @@ p {
 #result-list {
   height: 600px;
   overflow: auto;
-}
+}*/
 
 /* Side Bar */
-/*header, aside {
-  background: rgba(0,0,0,0.75);
-  color: white;
-  margin: 0;
-  padding: 8px;
-  position: absolute;
-  width: 200px;
-}
 
-header {
+
+/*header {
   height: 100px;
   top: 0;
   left: 0;

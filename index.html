@@ -35,16 +35,15 @@
             <img src="img/blueDino41.png" data-bind='click: toggleDinos.bind($data, "omnivore")'><p class='legend_caption'>Omnivore</p><br><hr>
             <img src="img/tRex.png" data-bind='click: toggleDinos.bind($data, "carnivore")'><p class='legend_caption'>Meat Eater</p><br><hr>
             <img src="img/plantEaterSm.png" data-bind='click: toggleDinos.bind($data, "herbivore")'><p class='legend_caption'>Plant Eater</p><br>
-            <button data-bind='click: toggleAllDinos, text: buttonText'>Show All Dinos!</button>
           </div>
-          <aside id="dinoList">
-            <h4 class="msg-to-user">Popular Dinosaurs</h4>
-            <ul data-bind="foreach: dinoList" id="list">
-              <li data-bind="text: name, click: $parent.displayThisDino" class="corner-info">
-              </li>
-            </ul>
-          </aside>
         </div>
+        <aside id="dinoListView">
+          <h4 class="msg-to-user">Popular Dinosaurs</h4>
+          <ul data-bind="foreach: dinoList" id="list">
+            <li data-bind="text: name, click: $parent.displayThisDino" class="corner-info">
+            </li>
+          </ul>
+        </aside>
       </div>
       <script src="https://cdn.firebase.com/js/client/2.1.1/firebase.js"></script>
       <script type="text/javascript" src="js/view.js"></script>
