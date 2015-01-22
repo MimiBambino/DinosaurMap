@@ -1,6 +1,8 @@
 // TODO:
 // Wikipedia image display
 // add click counter to legend images to require 3 clicks before list appears
+// Clean up media queries!!!
+// Final refactoring/cleanup
 // Fertig!
 
 var map, geoCoder;
@@ -36,10 +38,11 @@ var ViewModel = function() {
 
     self.locationInstruction = ko.observable(false);
     self.filterDinoInstruction = ko.observable(false);
-    self.dinoListInstruction = ko.observable(false);  // Need to set back to false after click
+    self.dinoListInstruction = ko.observable(false);
     self.showLegend = ko.observable(false);
-    self.listVisible = ko.observable(true);  // Change this later
+    self.listVisible = ko.observable(true);
     self.activeInfowindow = ko.observable();
+    self.search = false;
 
     self.setFalse = function(){
 
@@ -173,9 +176,12 @@ var ViewModel = function() {
     // Ajax call to Wikipedia to get content for infowindows
     self.dinoDataRequest = function(infowindow){
         var url = "http://en.wikipedia.org/w/api.php?action=query&prop=extracts&format=json&exintro=&titles=";
-        url += infowindow.title;
-        if (infowindow.title == "Saturnalia" || infowindow.title == "Balaur") {
-            url += "_(dinosaur)";
+        if (infowindow.title == "Tyrannosaurus Rex") {
+            url += "Tyrannosaurus"
+        } else if (infowindow.title == "Saturnalia" || infowindow.title == "Balaur") {
+            url += infowindow.title + "_(dinosaur)";
+        } else {
+            url += infowindow.title;
         }
         $.ajax( {
             url: url,
@@ -234,7 +240,7 @@ var ViewModel = function() {
 
     self.location = ko.observable("");
 
-    self.getLocation = ko.computed(function() {
+        self.getLocation = ko.computed(function() {
         geocoder = new google.maps.Geocoder();
         geocoder.geocode( {address: self.location()}, function(results,status) {
             //check if geocode was successful
@@ -243,9 +249,11 @@ var ViewModel = function() {
                 if (person) {
                     personMarker.setMap(null);
                 }
+                if (self.search == false) {
+                    self.filterDinoInstruction(true);
+                }
                 // set true to indicate a search has been performed and to display markers
                 self.search = true;
-
                 // take the first result from the returned array
                 var loc = results[0].geometry.location;
                 //center map and display marker
@@ -260,9 +268,7 @@ var ViewModel = function() {
                 });
                 self.location("");
                 self.locationInstruction(false);
-                self.filterDinoInstruction(true);
                 self.showLegend(true);
-
                 // this indicates that the user's icon is displayed
                 person = true;
                 return loc;

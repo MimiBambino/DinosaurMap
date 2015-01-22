@@ -481,7 +481,17 @@ aside {
   #cityInput {
   font-size: 16px;
   left: 34%;
-}
+  }
+
+  aside {
+    width: 185px;
+  }
+/* WTH? With the container width???*/
+  #container {
+    width: 95%;
+    margin-right: 3%
+    margin-left: 12%;
+  }
 
 }
 
@@ -495,6 +505,7 @@ aside {
   #container {
   height: 90%;
   margin-top: 6%;
+  margin-left: 17%;
 }
 
   #cityInput {
@@ -507,13 +518,16 @@ aside {
   #toggleDinosInstruction {
     left: 1%;
   }
+
+  #container {
+    width: 79%;
+    margin-left: 20%;
+    margin-right: 1%;
+  }
 }
 
 @media (max-width: 1300px) {
   #container {
-    width: 80%;
-    margin-left: 18%;
-    margin-right: 2%;
     height: 88%;
     margin-top: 8%;
   }
