@@ -2,17 +2,21 @@ Project 5 of the Udacity Frontend Nanodegree
 
 Find out which dinosaurs lived in your neck of the woods.
 
-Can be viewed at http://mimibambino.github.io/Map/
+Can be viewed at http://mimibambino.github.io/DinosaurMap/
 
 Instructions
 ================
 
-Enter a location in the search bar at the bottom of the screen (or turn on location services for auto-detect)
+Click on the link provided above or clone the repository and open the index.html
+file found inside the public directory.
 
-Filter search results by typing a query in the search bar in the upper right hand corner
+Enter a location in the search bar at the top of the screen
 
-The list will contain 10 dinosaur fossils that were found nearest to your location.
+Filter search results by clicking on a dinosaur image in the legend.
 
-Clicking on a marker or list item centers the map on the item and gives an info window with data about the kind of dinosaur fossil and any YouTube videos on that kind of dinosaur.
+Click a dinosaur name in the list to see where that dinosaur was discovered.
+
+There is a link in the infoboxes that will take you to more information about
+that dinosaur on Wikipedia.
 
 

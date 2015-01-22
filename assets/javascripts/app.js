@@ -1,8 +1,3 @@
-// TODO:
-// Wikipedia image display
-// Research Grunt and build processes
-// Fertig!
-
 var map, geoCoder;
 var person = false;
 
@@ -28,7 +23,7 @@ var Dino = function(data) {
             return 'img/plantEaterSm.png';
         }
     }, this);
-}
+};
 
 var ViewModel = function() {
 
@@ -138,11 +133,11 @@ var ViewModel = function() {
                     title: dino.name,
                     visible: false
                 });
-                if (dino.food() == 'carnivore') {
+                if (dino.food() === 'carnivore') {
                     self.carnivoreMarkers().push(marker);
-                } else if (dino.food() == 'herbivore') {
+                } else if (dino.food() === 'herbivore') {
                     self.herbivoreMarkers().push(marker);
-                } else if (dino.food() == 'omnivore') {
+                } else if (dino.food() === 'omnivore') {
                     self.omnivoreMarkers().push(marker);
                 }
                 dino.markers().push(marker);
@@ -170,7 +165,7 @@ var ViewModel = function() {
             self.dinoDataRequest(infowindow);
             var j = 0;
             var markers = dinos[i].markers();
-            var markerLength = markers.length
+            var markerLength = markers.length;
             for (; j < markerLength; j++) {
                 var marker = markers[j];
                 google.maps.event.addListener(marker, 'click', (function(marker, infowindow) {
@@ -185,7 +180,6 @@ var ViewModel = function() {
                 })(marker, infowindow));
             }
         }
-        self.dinoPhotoRequest();
     };
 
     /**
@@ -194,13 +188,12 @@ var ViewModel = function() {
     self.dinoDataRequest = function(infowindow){
         var url = "http://en.wikipedia.org/w/api.php?action=query&prop=extracts&format=json&exintro=&titles=";
         // Set the correct url for the special case dinos
-        if (infowindow.title == "Tyrannosaurus Rex") {
-            url += "Tyrannosaurus"
-        } else if (infowindow.title == "Saturnalia" || infowindow.title == "Balaur") {
-            url += infowindow.title + "_(dinosaur)";
-        } else {
-            url += infowindow.title;
+        if (infowindow.title === "Tyrannosaurus Rex") {
+            infowindow.title = "Tyrannosaurus";
+        } else if (infowindow.title === "Saturnalia" || infowindow.title === "Balaur") {
+            infowindow.title += "_(dinosaur)";
         }
+        url += infowindow.title;
         $.ajax( {
             url: url,
             xhrFields: {
@@ -213,10 +206,10 @@ var ViewModel = function() {
                 var key = parseInt(keys[0], 10);
                 var paragraph = response.query.pages[key].extract.substring(0,300);
                 // Add list of continents where dinosaur lived
-                infowindow.setContent("<div class='infoWindow'><h3>Hi, my name is <strong>"
-                    + infowindow.title + "</strong>!</h3></div><div>"
-                    + paragraph + "...</p></div><div>For more see: <a href='http://www.wikipedia.org/wiki/"
-                    + infowindow.title + "' target='_blank'>Wikipedia</a></div>");
+                infowindow.setContent("<div class='infoWindow'><h3>Hi, my name is <strong>" +
+                    infowindow.title + "</strong>!</h3></div><div>" +
+                    paragraph + "...</p></div><div>For more see: <a href='http://www.wikipedia.org/wiki/"+
+                    infowindow.title + "' target='_blank'>Wikipedia</a></div>");
             },
             type:'GET',
             headers: {
@@ -224,35 +217,6 @@ var ViewModel = function() {
                 'Access-Control-Allow-Origin': true
              }
         });
-    };
-
-    /**
-     * Ajax call to Wikipedia to find dinosaur images
-     * Save images to the photoArray property for each dino in dinoList
-     */
-    self.dinoPhotoRequest = function() {};
-
-    self.dinoPhotoRequest = function(marker, infowindow){
-        $.ajax({
-            url: "http://en.wikipedia.org/w/api.php?action=query&list=allimages&aiprop=url&aisort=name&aiprop=size&format=json&titles=Tyrannosaurus",
-            xhrFields: {
-                withCredentials: true
-            },
-            dataType:'jsonp',
-            success: function(response){
-                //var keys = Object.keys(response.query.pages);
-                //var key = parseInt(keys[0], 10);
-                //var paragraph = response.query.pages[key].extract.substring(0,300);
-                // Add list of continents where dinosaur lived
-                //infowindow.setContent("<div class='infoWindow'><h3>Hi, my name is " + marker.title + "!</h3></div><div>" + paragraph + "...</p></div><div>For more see: <a href='http://www.wikipedia.org/wiki/" + marker.title + "' target='_blank'>Wikipedia</a></div>");
-                console.log(response);
-            },
-            type:'GET',
-            headers: {
-                'Api-User-Agent': "Cynthia O\'Donnell: mimibambino@gmail.com",
-                'Access-Control-Allow-Origin': true
-             }
-        })
     };
 
     self.location = ko.observable("");
@@ -266,13 +230,13 @@ var ViewModel = function() {
         geocoder = new google.maps.Geocoder();
         geocoder.geocode( {address: self.location()}, function(results,status) {
             //check if geocode was successful
-            if (status == google.maps.GeocoderStatus.OK) {
+            if (status === google.maps.GeocoderStatus.OK) {
                 // if user's icon is already displayed, remove it from the screen
                 if (person) {
                     personMarker.setMap(null);
                 }
                 // prevent instructions from appearing if used searched already
-            if (self.search == false) {
+            if (self.search === false) {
                 self.filterDinoInstruction(true);
             }
             // set true to indicate a search has been performed and to display markers
@@ -319,11 +283,11 @@ var ViewModel = function() {
                 self.display(markers);
                 break;
             case "carnivore":
-                var markers = self.carnivoreMarkers();
+                markers = self.carnivoreMarkers();
                 self.display(markers);
                 break;
             case "herbivore":
-                var markers = self.herbivoreMarkers();
+                markers = self.herbivoreMarkers();
                 self.display(markers);
                 break;
             case "all":
@@ -337,15 +301,14 @@ var ViewModel = function() {
     self.display = function(markers) {
         // if more than one of the markers is hidden, display all of the
         // markers of that type
-        if (markers[0].visible == false || markers[2].visible == false) {
+        if (markers[0].visible === false || markers[2].visible === false) {
             for (var i = 0; i < markers.length; i++) {
             var marker = markers[i];
             marker.setVisible(true);
             }
         // if more that one of the markers is visible, call the hide function
-        } else if (markers[0].visible == true || markers[2].visible == true) {
+        } else if (markers[0].visible === true || markers[2].visible === true) {
             self.hide(markers);
-
         }
     };
 
@@ -371,10 +334,10 @@ var ViewModel = function() {
         var dinos = self.dinoList();
         var length = dinos.length;
         var i = 0;
-        for (var i = 0; i < length; i++) {
+        for (; i < length; i++) {
             var dino = dinos[i];
             var marker = dinos[i].markers()[0];
-            if (name == dino.name) {
+            if (name === dino.name) {
                 marker.setVisible(true);
                 map.panTo(marker.position);
                 break;

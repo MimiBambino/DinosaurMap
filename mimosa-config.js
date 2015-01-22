@@ -7,7 +7,6 @@ exports.config = {
     "require",
     "minify-js",
     "minify-css",
-    "live-reload",
-    "bower"
+    "live-reload"
   ]
 }
