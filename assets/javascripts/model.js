@@ -243,7 +243,7 @@ var dinoData = [
             "latLongs": [[47.134843, 113.129218]],
             "food": "omnivore",
             "description": "The central Asian Oviraptor was a classic victim of mistaken identity: its type fossil was discovered atop a clutch of what were assumed to be Protoceratops eggs, occasioning this dinosaurs name (Greek for egg thief). It later turned out that this Oviraptor specimen was brooding its own eggs, like any good parent, and was in fact a relatively smart and law-abiding theropod."
-        },              
+        },
         {
             "name": "Psittacosaurus",
             "continents": ["Asia"],
@@ -447,4 +447,4 @@ var dinoData = [
             "food": "carnivore",
             "description": ""
         }
-    ]
+    ];

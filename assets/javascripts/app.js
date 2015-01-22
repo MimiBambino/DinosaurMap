@@ -1,5 +1,6 @@
 // TODO:
 // Wikipedia image display
+// Research Grunt and build processes
 // Fertig!
 
 var map, geoCoder;
@@ -231,9 +232,9 @@ var ViewModel = function() {
      */
     self.dinoPhotoRequest = function() {};
 
-    /*self.dinoPhotoRequest = function(marker, infowindow){
+    self.dinoPhotoRequest = function(marker, infowindow){
         $.ajax({
-            url: "http://en.wikipedia.org/w/api.php?action=query&titles=Al-Farabi&prop=pageimages&format=json&pithumbsize=100";
+            url: "http://en.wikipedia.org/w/api.php?action=query&list=allimages&aiprop=url&aisort=name&aiprop=size&format=json&titles=Tyrannosaurus",
             xhrFields: {
                 withCredentials: true
             },
@@ -243,16 +244,16 @@ var ViewModel = function() {
                 //var key = parseInt(keys[0], 10);
                 //var paragraph = response.query.pages[key].extract.substring(0,300);
                 // Add list of continents where dinosaur lived
-                infowindow.setContent("<div class='infoWindow'><h3>Hi, my name is " + marker.title + "!</h3></div><div>" + paragraph + "...</p></div><div>For more see: <a href='http://www.wikipedia.org/wiki/" + marker.title + "' target='_blank'>Wikipedia</a></div>");
-
+                //infowindow.setContent("<div class='infoWindow'><h3>Hi, my name is " + marker.title + "!</h3></div><div>" + paragraph + "...</p></div><div>For more see: <a href='http://www.wikipedia.org/wiki/" + marker.title + "' target='_blank'>Wikipedia</a></div>");
+                console.log(response);
             },
             type:'GET',
             headers: {
                 'Api-User-Agent': "Cynthia O\'Donnell: mimibambino@gmail.com",
                 'Access-Control-Allow-Origin': true
              }
-             })
-    };*/
+        })
+    };
 
     self.location = ko.observable("");
 

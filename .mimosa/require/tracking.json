@@ -1,0 +1,18 @@
+{
+  "shims": {},
+  "deps": {
+    "/icomoon/demo-files/demo.js": [],
+    "/javascripts/app.js": [],
+    "/javascripts/knockout.js": [
+      "exports",
+      "require"
+    ],
+    "/javascripts/model.js": [],
+    "/javascripts/view.js": []
+  },
+  "aliases": {},
+  "mappings": {},
+  "packages": {},
+  "originalConfig": {},
+  "requireFiles": []
+}
