@@ -1,13 +1,13 @@
 // TODO:
 // Wikipedia image display
-// add click counter to legend images to require 3 clicks before list appears
-// Clean up media queries!!!
-// Final refactoring/cleanup
 // Fertig!
 
 var map, geoCoder;
 var person = false;
 
+/**
+ * Prototype for all application data
+ */
 var Dino = function(data) {
     this.name = data.name;
     this.continents = ko.observableArray(data.continents);
@@ -31,27 +31,31 @@ var Dino = function(data) {
 
 var ViewModel = function() {
 
-    // save a reference to ViewModel object
+    // Saves a reference to ViewModel object
     var self = this;
 
     self.startLoc = new google.maps.LatLng(33.5, 7.6);
 
+    // Keeps track of which instructions have been flashed to the user.
     self.locationInstruction = ko.observable(false);
     self.filterDinoInstruction = ko.observable(false);
     self.dinoListInstruction = ko.observable(false);
     self.showLegend = ko.observable(false);
     self.listVisible = ko.observable(true);
-    self.activeInfowindow = ko.observable();
     self.search = false;
 
-    self.setFalse = function(){
-
-    };
+    // Keeps track of any open infowindows.
+    self.activeInfowindow = ko.observable();
 
     self.init = function() {
         google.maps.event.addDomListener(window, 'load', self.initMap);
     };
 
+    /**
+     * Main initialization function which creates the map, sets the styling
+     * and other options, and initializes the call to Firebase to retrieve
+     * dinosaur data.
+     */
     self.initMap = function() {
         //create a new StyledMapType and reference it with the style array
         var bluishStyledMap = new google.maps.StyledMapType(View.bluishMapStyle,
@@ -80,7 +84,10 @@ var ViewModel = function() {
     };
 
     self.firebaseData = {};
-    // Retrieve data from Firebase
+
+    /**
+     * Retrieves data from Firebase and initializes call to create the dinoList
+     */
     self.fetchFirebase = function(){
         var FB = new Firebase("https://intense-inferno-1224.firebaseio.com/");
         FB.on('value', function(data) {
@@ -90,10 +97,12 @@ var ViewModel = function() {
             });
     };
 
-    // Store a local copy of all dinoData
+    // This is the main source of data for the application.
     self.dinoList = ko.observableArray();
 
-    // Populate the dinoList array
+    /**
+     * Populates the dinoList array and initializes the call to create markers.
+     */
     self.setDinoList = function(data) {
         data.forEach(function(item) {
             self.dinoList().push( new Dino(item) );
@@ -106,7 +115,10 @@ var ViewModel = function() {
     self.omnivoreMarkers = ko.observableArray();
     self.herbivoreMarkers = ko.observableArray();
 
-    // Create map markers and set each one as a property in the Dino object in the dinoList array
+    /**
+     * Create map markers and set each one as a property in the Dino object
+     * in the dinoList array. Initializes call to create infowindows.
+     */
     self.createDinoMarkers = function() {
         var dinoList = self.dinoList();
         for (var i = 0; i < dinoList.length; i++) {
@@ -138,8 +150,10 @@ var ViewModel = function() {
         self.createInfoWindows();
     };
 
-    // Create an infowindow for each dino in dinoList that is attached to all
-    // instances of that dino type because there are 64 dinos, but 105 markers.
+    /**
+     * Creates an infowindow for each dino in dinoList that is attached to all
+     * instances of that dino type because there are 64 dinos, but 105 markers.
+     */
     self.createInfoWindows = function() {
         var i = 0;
         var dinos = self.dinoList();
@@ -149,7 +163,9 @@ var ViewModel = function() {
                 content: "",
                 title: dinos[i].name
             });
+            // Set the infowindow as a property of that dino in dinoList
             dinos[i].infoWindow(infowindow);
+            // Initialize ajax call to Wikipedia for infowindow content
             self.dinoDataRequest(infowindow);
             var j = 0;
             var markers = dinos[i].markers();
@@ -158,11 +174,9 @@ var ViewModel = function() {
                 var marker = markers[j];
                 google.maps.event.addListener(marker, 'click', (function(marker, infowindow) {
                 return function() {
-                    //self.closeInfobox(infowindow);
                     if (self.activeInfowindow()){
                         self.activeInfowindow().close();
                     }
-                    // Add more detail about location -- name the country or general location in markup
                     infowindow.open(map, marker);
                     map.panTo(marker.position);
                     self.activeInfowindow(infowindow);
@@ -173,9 +187,12 @@ var ViewModel = function() {
         self.dinoPhotoRequest();
     };
 
-    // Ajax call to Wikipedia to get content for infowindows
+    /**
+     * Ajax call to Wikipedia to get content for infowindows
+     */
     self.dinoDataRequest = function(infowindow){
         var url = "http://en.wikipedia.org/w/api.php?action=query&prop=extracts&format=json&exintro=&titles=";
+        // Set the correct url for the special case dinos
         if (infowindow.title == "Tyrannosaurus Rex") {
             url += "Tyrannosaurus"
         } else if (infowindow.title == "Saturnalia" || infowindow.title == "Balaur") {
@@ -190,11 +207,15 @@ var ViewModel = function() {
             },
             dataType:'jsonp',
             success: function(response){
+                // Parses the response and sets infobox content
                 var keys = Object.keys(response.query.pages);
                 var key = parseInt(keys[0], 10);
                 var paragraph = response.query.pages[key].extract.substring(0,300);
                 // Add list of continents where dinosaur lived
-                infowindow.setContent("<div class='infoWindow'><h3>Hi, my name is <strong>" + infowindow.title + "</strong>!</h3></div><div>" + paragraph + "...</p></div><div>For more see: <a href='http://www.wikipedia.org/wiki/" + infowindow.title + "' target='_blank'>Wikipedia</a></div>");
+                infowindow.setContent("<div class='infoWindow'><h3>Hi, my name is <strong>"
+                    + infowindow.title + "</strong>!</h3></div><div>"
+                    + paragraph + "...</p></div><div>For more see: <a href='http://www.wikipedia.org/wiki/"
+                    + infowindow.title + "' target='_blank'>Wikipedia</a></div>");
             },
             type:'GET',
             headers: {
@@ -204,8 +225,10 @@ var ViewModel = function() {
         });
     };
 
-    // Ajax call to find dinosaur images
-    // Save images to a photoArray property for each dino in dinoList
+    /**
+     * Ajax call to Wikipedia to find dinosaur images
+     * Save images to the photoArray property for each dino in dinoList
+     */
     self.dinoPhotoRequest = function() {};
 
     /*self.dinoPhotoRequest = function(marker, infowindow){
@@ -231,16 +254,14 @@ var ViewModel = function() {
              })
     };*/
 
-    // Begin User Interface Instructions and listen for events
-
-    // After the user has toggled a dinosaur by type, the Legend instruction
-    // fades out and the List and List Instruction fade in.
-    // After the User has selected a dinosaur from the list, the List Instruction
-    // fades out and the map pans to the dinosaur marker
-
     self.location = ko.observable("");
 
-        self.getLocation = ko.computed(function() {
+    /**
+     * Begins User Interface Instructions and listens for user events
+     * Initially, it determines the coordinates for the user's search
+     * and displays the user's marker on the map
+     */
+    self.getLocation = ko.computed(function() {
         geocoder = new google.maps.Geocoder();
         geocoder.geocode( {address: self.location()}, function(results,status) {
             //check if geocode was successful
@@ -249,37 +270,42 @@ var ViewModel = function() {
                 if (person) {
                     personMarker.setMap(null);
                 }
-                if (self.search == false) {
-                    self.filterDinoInstruction(true);
-                }
-                // set true to indicate a search has been performed and to display markers
-                self.search = true;
-                // take the first result from the returned array
-                var loc = results[0].geometry.location;
-                //center map and display marker
-                map.setCenter(loc);
-                map.setZoom(5);
-                //self.createDinoMarkers(self.dinoList);
-                //self.newDinoMarker();
-                personMarker = new google.maps.Marker({
-                    map: map,
-                    position: loc,
-                    icon: 'img/manSm.png'
-                });
-                self.location("");
-                self.locationInstruction(false);
-                self.showLegend(true);
-                // this indicates that the user's icon is displayed
-                person = true;
-                return loc;
+                // prevent instructions from appearing if used searched already
+            if (self.search == false) {
+                self.filterDinoInstruction(true);
+            }
+            // set true to indicate a search has been performed and to display markers
+            self.search = true;
+            // take the first result from the returned array
+            var loc = results[0].geometry.location;
+            //center map and display marker
+            map.setCenter(loc);
+            map.setZoom(5);
+            //self.createDinoMarkers(self.dinoList);
+            //self.newDinoMarker();
+            personMarker = new google.maps.Marker({
+                map: map,
+                position: loc,
+                icon: 'img/manSm.png'
+            });
+            self.location("");
+            self.locationInstruction(false);
+            self.showLegend(true);
+            // this indicates that the user's icon is displayed
+            person = true;
+            return loc;
             }
             else {
-                // If no location found based on search
-                return self.startLoc;
+        // If no location found based on search
+            return self.startLoc;
             }
         });
     });
 
+    /**
+     * Called from Knockout binding on the legend element.  Determines
+     * which class of dinosaur to display and calls the display function
+     */
     self.toggleDinos = function() {
         self.filterDinoInstruction(false);
         self.dinoListInstruction(true);
@@ -304,18 +330,25 @@ var ViewModel = function() {
         }
     };
 
+    /**
+     * Displays or hides groups of dinosaurs
+     */
     self.display = function(markers) {
+        // if more than one of the markers is hidden, display all of the
+        // markers of that type
         if (markers[0].visible == false || markers[2].visible == false) {
             for (var i = 0; i < markers.length; i++) {
             var marker = markers[i];
             marker.setVisible(true);
             }
+        // if more that one of the markers is visible, call the hide function
         } else if (markers[0].visible == true || markers[2].visible == true) {
             self.hide(markers);
 
         }
     };
 
+    // Hides all of the passed in markers
     self.hide = function(markers) {
         for (var i = 0; i < markers.length; i++){
             var marker = markers[i];
@@ -323,6 +356,9 @@ var ViewModel = function() {
         }
     };
 
+    /**
+     * Ensures that only one marker is shown when the user clicks on a dinosaur name.
+     */
     self.displayThisDino = function() {
         if (self.activeInfowindow()){
             self.activeInfowindow().close();
@@ -348,6 +384,9 @@ var ViewModel = function() {
     self.init();
 };
 
+/**
+ * Custom binding for fade in effect on instructions
+ */
 ko.bindingHandlers.fadeVisible = {
     init: function(element, valueAccessor) {
         // Initially set the element to be instantly visible/hidden depending on the value
