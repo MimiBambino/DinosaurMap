@@ -18,7 +18,7 @@ exports.config = {
                                        # the project root, or absolute
     compiledDir: "public"              # directory location of compiled web assets, can be
                                        # relative to the project root, or absolute
-    javascriptDir: "js"       # Location of precompiled javascript (i.e.
+    javascriptDir: "javascripts"       # Location of precompiled javascript (i.e.
                                        # coffeescript), must be relative to sourceDir
     exclude: [/[/\\](\.|~)[^/\\]+$/]   # regexes or strings matching the files to be
                                        # ignored by mimosa, the default matches all sorts of

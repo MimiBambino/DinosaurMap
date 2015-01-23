@@ -188,12 +188,13 @@ var ViewModel = function() {
     self.dinoDataRequest = function(infowindow){
         var url = "http://en.wikipedia.org/w/api.php?action=query&prop=extracts&format=json&exintro=&titles=";
         // Set the correct url for the special case dinos
-        if (infowindow.title === "Tyrannosaurus Rex") {
-            infowindow.title = "Tyrannosaurus";
-        } else if (infowindow.title === "Saturnalia" || infowindow.title === "Balaur") {
-            infowindow.title += "_(dinosaur)";
+        var name = infowindow.title;
+        if (name === "Tyrannosaurus Rex") {
+            name = "Tyrannosaurus";
+        } else if (name === "Saturnalia" || name === "Balaur") {
+            name += "_(dinosaur)";
         }
-        url += infowindow.title;
+        url += name;
         $.ajax( {
             url: url,
             xhrFields: {
@@ -209,7 +210,7 @@ var ViewModel = function() {
                 infowindow.setContent("<div class='infoWindow'><h3>Hi, my name is <strong>" +
                     infowindow.title + "</strong>!</h3></div><div>" +
                     paragraph + "...</p></div><div>For more see: <a href='http://www.wikipedia.org/wiki/"+
-                    infowindow.title + "' target='_blank'>Wikipedia</a></div>");
+                    name + "' target='_blank'>Wikipedia</a></div>");
             },
             type:'GET',
             headers: {

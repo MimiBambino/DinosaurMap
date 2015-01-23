@@ -1,10 +1,12 @@
 exports.config = {
   "modules": [
     "copy",
-    'server',
     "jshint",
     "csslint",
+    "server",
+    "require",
     "minify-js",
-    "minify-css"
+    "minify-css",
+    "live-reload"
   ]
 }
